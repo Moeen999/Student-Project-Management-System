@@ -12,7 +12,7 @@
   </div>
 
   {% if project.status == 'pending' %}
-    <div style="display: flex; gap: 15px; justify-content: center;">
+    <div class="action-buttons">
       <form method="post" style="display: inline;">
         {% csrf_token %}
         <input type="hidden" name="action" value="approve">

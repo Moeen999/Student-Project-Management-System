@@ -5,27 +5,30 @@ from .models import Project
 from .forms import ProjectForm
 from accounts.models import Profile
 
+def get_user_role(user):
+    try:
+        profile = Profile.objects.get(user=user)
+        return profile.role
+    except Profile.DoesNotExist:
+        return 'student'
+
 def dashboard(request):
     if request.user.is_authenticated:
-        try:
-            profile = Profile.objects.get(user=request.user)
-            if profile.role == 'teacher':
-                # Teacher sees all projects for review
-                projects = Project.objects.all().order_by('-id')
-                return render(request, 'teacher_dashboard.html', {'projects': projects})
-            else:
-                # Student sees only their own projects
-                projects = Project.objects.filter(student=request.user).order_by('-id')
-                return render(request, 'dashboard.html', {'projects': projects})
-        except Profile.DoesNotExist:
-            # If no profile exists, default to student view
+        user_role = get_user_role(request.user)
+        if user_role == 'teacher':
+            # Teacher sees all projects for review
+            projects = Project.objects.all().order_by('-id')
+            return render(request, 'teacher_dashboard.html', {'projects': projects, 'user_role': user_role})
+        else:
+            # Student sees only their own projects
             projects = Project.objects.filter(student=request.user).order_by('-id')
-            return render(request, 'dashboard.html', {'projects': projects})
+            return render(request, 'dashboard.html', {'projects': projects, 'user_role': user_role})
     else:
         return redirect('login')
 
 @login_required
 def add_project(request):
+    user_role = get_user_role(request.user)
     form = ProjectForm(request.POST or None)
     if form.is_valid():
         project = form.save(commit=False)
@@ -33,16 +36,12 @@ def add_project(request):
         project.save()
         messages.success(request, 'Project submitted successfully!')
         return redirect('dashboard')
-    return render(request, 'project_add.html', {'form': form})
+    return render(request, 'project_add.html', {'form': form, 'user_role': user_role})
 
 @login_required
 def review_project(request, project_id):
-    try:
-        profile = Profile.objects.get(user=request.user)
-        if profile.role != 'teacher':
-            messages.error(request, 'Access denied. Teachers only.')
-            return redirect('dashboard')
-    except Profile.DoesNotExist:
+    user_role = get_user_role(request.user)
+    if user_role != 'teacher':
         messages.error(request, 'Access denied. Teachers only.')
         return redirect('dashboard')
 
@@ -59,4 +58,4 @@ def review_project(request, project_id):
         project.save()
         return redirect('dashboard')
 
-    return render(request, 'project_review.html', {'project': project})
+    return render(request, 'project_review.html', {'project': project, 'user_role': user_role})
