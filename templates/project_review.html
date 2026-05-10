@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Review Project - Student Project Management System{% endblock %}
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+  <h2>Review Project</h2>
+
+  <div class="project-review-card" style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+    <h3 style="color: #667eea; margin-bottom: 15px;">{{ project.title }}</h3>
+    <p style="margin-bottom: 15px; line-height: 1.6;"><strong>Description:</strong> {{ project.description }}</p>
+    <p style="margin-bottom: 15px;"><strong>Student:</strong> {{ project.student.username }}</p>
+    <p style="margin-bottom: 15px;"><strong>Status:</strong> <span class="project-status status-{{ project.status }}">{{ project.get_status_display }}</span></p>
+  </div>
+
+  {% if project.status == 'pending' %}
+    <div style="display: flex; gap: 15px; justify-content: center;">
+      <form method="post" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="approve">
+        <button type="submit" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+          ✓ Approve Project
+        </button>
+      </form>
+
+      <form method="post" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reject">
+        <button type="submit" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); border: none; color: white; padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+          ✗ Reject Project
+        </button>
+      </form>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 20px; background: #e9ecef; border-radius: 8px;">
+      <p style="margin: 0; font-size: 16px;">This project has already been {{ project.get_status_display|lower }}.</p>
+    </div>
+  {% endif %}
+
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="/" class="btn" style="background: #6c757d;">← Back to Dashboard</a>
+  </div>
+</div>
+{% endblock %}

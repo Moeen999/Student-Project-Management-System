@@ -1,0 +1,46 @@
+{% extends 'base.html' %} {% block title %}Teacher Dashboard - Student Project
+Management System{% endblock %} {% block content %}
+<h2>Project Review Dashboard</h2>
+
+<div class="projects-header">
+  <div></div>
+</div>
+
+{% if projects %}
+<div class="projects-grid">
+  {% for p in projects %}
+  <div class="project-card">
+    <h3 class="project-title">{{ p.title }}</h3>
+    <p class="project-description">{{ p.description }}</p>
+    <p class="project-student">
+      <strong>Student:</strong> {{ p.student.username }}
+    </p>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+      "
+    >
+      <span class="project-status status-{{ p.status }}"
+        >{{ p.get_status_display }}</span
+      >
+      {% if p.status == 'pending' %}
+      <a
+        href="/review/{{ p.id }}/"
+        class="btn"
+        style="padding: 8px 15px; font-size: 14px"
+        >Review</a
+      >
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <h3>No Projects Yet</h3>
+  <p>No student projects have been submitted for review.</p>
+</div>
+{% endif %} {% endblock %}

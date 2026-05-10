@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Project Management System{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="/" class="brand-text">SPMS</a>
+            </div>
+            <ul class="nav-menu">
+                {% if user.is_authenticated %}
+                    {% load accounts_tags %}
+                    {% get_user_role user as user_role %}
+                    {% if user_role == 'teacher' %}
+                        <li><a href="/" class="nav-link">Review Projects</a></li>
+                        <li class="nav-item-user">
+                            <span class="user-info">{{ user.username }} (Teacher)</span>
+                            <a href="/accounts/logout/" class="nav-link logout-btn">Logout</a>
+                        </li>
+                    {% else %}
+                        <li><a href="/" class="nav-link">My Projects</a></li>
+                        <li><a href="/add/" class="nav-link">Add Project</a></li>
+                        <li class="nav-item-user">
+                            <span class="user-info">{{ user.username }} (Student)</span>
+                            <a href="/accounts/logout/" class="nav-link logout-btn">Logout</a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="/accounts/login/" class="nav-link">Login</a></li>
+                    <li><a href="/accounts/register/" class="nav-link register-btn">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Student Project Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

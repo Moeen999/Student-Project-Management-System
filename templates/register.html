@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Register - Student Project Management System{% endblock %}
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto;">
+  <h2>Create Account</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="id_username">Username</label>
+      <input type="text" id="id_username" name="username" placeholder="Choose a username" required />
+      {% if form.username.errors %}
+        <div style="color: #dc3545; font-size: 13px; margin-top: 5px;">
+          {% for error in form.username.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="id_password">Password</label>
+      <input type="password" id="id_password" name="password" placeholder="Create a password" required />
+      {% if form.password.errors %}
+        <div style="color: #dc3545; font-size: 13px; margin-top: 5px;">
+          {% for error in form.password.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="id_role">I am registering as a:</label>
+      <select id="id_role" name="role" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 14px; transition: all 0.3s ease;">
+        <option value="">Select your role</option>
+        <option value="student">Student - Submit and track my projects</option>
+        <option value="teacher">Teacher - Review and approve student projects</option>
+      </select>
+      {% if form.role.errors %}
+        <div style="color: #dc3545; font-size: 13px; margin-top: 5px;">
+          {% for error in form.role.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <button type="submit">Create Account</button>
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}My Projects - Student Project Management System{% endblock %}
+{% block content %}
+<h2>My Projects</h2>
+
+<div class="projects-header">
+  <div></div>
+  <a href="/add/">+ Add New Project</a>
+</div>
+
+{% if messages %}
+  {% for message in messages %}
+    <div style="background: {% if message.tags == 'success' %}#d4edda{% else %}#f8d7da{% endif %}; color: {% if message.tags == 'success' %}#155724{% else %}#721c24{% endif %}; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid {% if message.tags == 'success' %}#28a745{% else %}#dc3545{% endif %};">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if projects %}
+  <div class="projects-grid">
+    {% for p in projects %}
+    <div class="project-card">
+      <h3 class="project-title">{{ p.title }}</h3>
+      <p class="project-description">{{ p.description }}</p>
+      <span class="project-status status-{{ p.status }}">{{ p.get_status_display }}</span>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <h3>No Projects Yet</h3>
+    <p>You haven't created any projects yet. Start by adding your first project!</p>
+    <a href="/add/" class="btn">Create Your First Project</a>
+  </div>
+{% endif %}
+{% endblock %}
