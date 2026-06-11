@@ -39,6 +39,37 @@ def add_project(request):
     return render(request, 'project_add.html', {'form': form, 'user_role': user_role})
 
 @login_required
+def edit_project(request, project_id):
+    user_role = get_user_role(request.user)
+    project = get_object_or_404(Project, id=project_id, student=request.user)
+
+    if project.status != 'pending':
+        messages.error(request, 'Only pending projects can be edited.')
+        return redirect('dashboard')
+
+    form = ProjectForm(request.POST or None, instance=project)
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Project updated successfully.')
+        return redirect('dashboard')
+
+    return render(request, 'project_edit.html', {'form': form, 'project': project, 'user_role': user_role})
+
+@login_required
+def delete_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id, student=request.user)
+
+    if project.status != 'pending':
+        messages.error(request, 'Only pending projects can be deleted.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        project.delete()
+        messages.success(request, 'Project deleted successfully.')
+    return redirect('dashboard')
+
+@login_required
 def review_project(request, project_id):
     user_role = get_user_role(request.user)
     if user_role != 'teacher':
@@ -49,13 +80,22 @@ def review_project(request, project_id):
 
     if request.method == 'POST':
         action = request.POST.get('action')
+
         if action == 'approve':
             project.status = 'approved'
+            project.save(update_fields=['status'])
+            from .models import ProjectReview
+            ProjectReview.objects.create(project=project, reviewed_by=request.user, status='approved', reason='Approved by teacher.')
             messages.success(request, f'Project "{project.title}" has been approved.')
         elif action == 'reject':
+            rejection_reason = request.POST.get('rejection_reason', '').strip() or 'No rejection reason provided.'
             project.status = 'rejected'
+            project.save(update_fields=['status'])
+            from .models import ProjectReview
+            ProjectReview.objects.create(project=project, reviewed_by=request.user, status='rejected', reason=rejection_reason)
             messages.success(request, f'Project "{project.title}" has been rejected.')
-        project.save()
+
         return redirect('dashboard')
 
-    return render(request, 'project_review.html', {'project': project, 'user_role': user_role})
+    latest_review = project.reviews.order_by('-reviewed_at').first()
+    return render(request, 'project_review.html', {'project': project, 'user_role': user_role, 'latest_review': latest_review})

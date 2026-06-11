@@ -15,3 +15,22 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ProjectReview(models.Model):
+    REVIEW_STATUS = (
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    )
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='reviews')
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='project_reviews')
+    status = models.CharField(max_length=20, choices=REVIEW_STATUS)
+    reason = models.TextField(blank=True)
+    reviewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-reviewed_at']
+
+    def __str__(self):
+        return f"{self.project.title} - {self.status}"

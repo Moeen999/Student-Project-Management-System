@@ -6,6 +6,14 @@ Management System{% endblock %} {% block content %}
   <div></div>
 </div>
 
+{% if messages %}
+  {% for message in messages %}
+    <div class="toast-message" style="background: {% if message.tags == 'success' %}#d4edda{% else %}#f8d7da{% endif %}; color: {% if message.tags == 'success' %}#155724{% else %}#721c24{% endif %}; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid {% if message.tags == 'success' %}#28a745{% else %}#dc3545{% endif %};">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
 {% if projects %}
 <div class="projects-grid">
   {% for p in projects %}
@@ -43,4 +51,18 @@ Management System{% endblock %} {% block content %}
   <h3>No Projects Yet</h3>
   <p>No student projects have been submitted for review.</p>
 </div>
-{% endif %} {% endblock %}
+{% endif %}
+
+<script>
+  setTimeout(function () {
+    const toasts = document.querySelectorAll('.toast-message');
+    toasts.forEach(function (toast) {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.4s ease';
+      setTimeout(function () {
+        toast.remove();
+      }, 400);
+    });
+  }, 4000);
+</script>
+{% endblock %}
