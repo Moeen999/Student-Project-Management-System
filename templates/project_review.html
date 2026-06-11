@@ -11,8 +11,15 @@
     <p style="margin-bottom: 15px;"><strong>Status:</strong> <span class="project-status status-{{ project.status }}">{{ project.get_status_display }}</span></p>
   </div>
 
+  {% if latest_review %}
+    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; color: #856404;">
+      <strong>Latest review:</strong> {{ latest_review.status|capfirst }} by {{ latest_review.reviewed_by.username }} on {{ latest_review.reviewed_at|date:'M d, Y H:i' }}<br>
+      {% if latest_review.reason %}<strong>Reason:</strong> {{ latest_review.reason }}{% endif %}
+    </div>
+  {% endif %}
+
   {% if project.status == 'pending' %}
-    <div class="action-buttons">
+    <div class="action-buttons" style="display:flex; gap:15px; flex-wrap:wrap; align-items:flex-start;">
       <form method="post" style="display: inline;">
         {% csrf_token %}
         <input type="hidden" name="action" value="approve">
@@ -24,9 +31,13 @@
       <form method="post" style="display: inline;">
         {% csrf_token %}
         <input type="hidden" name="action" value="reject">
-        <button type="submit" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); border: none; color: white; padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-          ✗ Reject Project
-        </button>
+        <div style="display:flex; flex-direction:column; gap:10px; min-width:320px;">
+          <label for="rejection_reason" style="font-weight:600; color:#333;">Reason for rejection</label>
+          <textarea id="rejection_reason" name="rejection_reason" rows="4" placeholder="Enter why this project is rejected" style="width:100%; padding:12px; border:2px solid #e0e0e0; border-radius:8px;"></textarea>
+          <button type="submit" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); border: none; color: white; padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            ✗ Reject Project
+          </button>
+        </div>
       </form>
     </div>
   {% else %}
