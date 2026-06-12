@@ -37,8 +37,23 @@
       <p class="project-description">{{ p.description }}</p>
       <span class="project-status status-{{ p.status }}">{{ p.get_status_display }}</span>
 
-      {% if p.status == 'rejected' and p.reviews.exists %}
-        <p style="margin-top: 12px; color: #721c24; font-size: 13px;"><strong>Rejection reason:</strong> {{ p.reviews.first.reason }}</p>
+      {% if p.reviews.exists %}
+        {% with latest_review=p.reviews.all|dictsortreversed:'reviewed_at'|first %}
+          <p style="margin-top: 12px; font-size: 13px; color: #2b3a4b;">
+            <strong>Reviewed by:</strong>
+            {% if latest_review.reviewed_by %}
+              {{ latest_review.reviewed_by.username }}
+            {% else %}
+              Unknown teacher
+            {% endif %}
+            <br>
+            <strong>Status:</strong> {{ latest_review.get_status_display }}
+            {% if latest_review.status == 'rejected' %}
+              <br>
+              <strong>Reason:</strong> {{ latest_review.reason }}
+            {% endif %}
+          </p>
+        {% endwith %}
       {% endif %}
 
       {% if user_role == 'student' and p.status == 'pending' %}
